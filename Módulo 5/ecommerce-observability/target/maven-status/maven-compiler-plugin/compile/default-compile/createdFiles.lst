@@ -1,0 +1,15 @@
+com\ecommerce\observability\presentation\controller\ProdutoController.class
+com\ecommerce\observability\infrastructure\cache\CacheConfig.class
+com\ecommerce\observability\infrastructure\config\MetricsConfig.class
+com\ecommerce\observability\infrastructure\config\ActuatorConfig.class
+com\ecommerce\observability\EcommerceObservabilityApplication.class
+com\ecommerce\observability\domain\model\Produto$ProdutoBuilder.class
+com\ecommerce\observability\domain\model\Categoria.class
+com\ecommerce\observability\infrastructure\config\DataInitializer.class
+com\ecommerce\observability\application\service\ProdutoResumo.class
+com\ecommerce\observability\infrastructure\config\TracingService.class
+com\ecommerce\observability\domain\model\Categoria$CategoriaBuilder.class
+com\ecommerce\observability\presentation\handler\GlobalExceptionHandler.class
+com\ecommerce\observability\domain\repository\ProdutoRepository.class
+com\ecommerce\observability\application\service\ProdutoService.class
+com\ecommerce\observability\domain\model\Produto.class

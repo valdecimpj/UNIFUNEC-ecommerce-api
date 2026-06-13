@@ -1,0 +1,5 @@
+com\ecommerce\observability\CacheUnitTest.class
+com\ecommerce\observability\PerformanceAndObservabilityTest.class
+com\ecommerce\observability\PerformanceAndObservabilityTest$TestCacheConfig.class
+com\ecommerce\observability\CacheUnitTest$TestCacheConfig.class
+com\ecommerce\observability\TestcontainersIntegrationTest.class

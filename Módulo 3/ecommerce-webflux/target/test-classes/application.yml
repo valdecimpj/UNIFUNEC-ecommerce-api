@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: ecommerce-webflux
+
+  r2dbc:
+    url: r2dbc:h2:mem:///webfluxdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ecommerce-reviews
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: minha-chave-secreta-minimo-256-bits-para-hs256-seguranca
+
+server:
+  port: 8080
+
+spring.webflux:
+  base-path: /
+
+logging:
+  level:
+    com.ecommerce: INFO
+    org.springframework.data.r2dbc: INFO
+    reactor.netty: WARN
+
+# Versão do MongoDB embarcado (Flapdoodle 4.x exige propriedade explícita)
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 7.0.2

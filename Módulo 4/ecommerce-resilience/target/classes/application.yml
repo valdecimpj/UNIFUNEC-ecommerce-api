@@ -1,0 +1,191 @@
+spring:
+  application:
+    name: ecommerce-order-service   # nome usado no Eureka e no LoadBalancer
+
+  main:
+    web-application-type: reactive  # obrigatório com Spring Cloud Gateway (WebFlux)
+
+  datasource:
+    url: jdbc:h2:mem:orderdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  # ============================================================
+  # KAFKA – mensageria de alta vazão, Event Sourcing, auditoria
+  # ============================================================
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # Garante at-least-once com ack de todos os replicas
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true          # exatamente uma vez no producer
+        max.in.flight.requests.per.connection: 1
+    consumer:
+      group-id: order-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.ecommerce.resilience.*"
+    # Dead Letter Topic – mensagens que falharam N vezes
+    listener:
+      ack-mode: MANUAL_IMMEDIATE        # controle manual de offset
+
+  # ============================================================
+  # RABBITMQ – routing por exchanges, DLQ, confirmação
+  # ============================================================
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # Confirmação de publicação (publisher confirms)
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+        acknowledge-mode: manual        # controle manual de ack
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000ms
+          multiplier: 2.0               # backoff exponencial
+
+server:
+  port: 8081
+
+# ============================================================
+# EUREKA CLIENT – registro no Service Discovery
+# ============================================================
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 10   # heartbeat a cada 10s
+    lease-expiration-duration-in-seconds: 30
+
+# ============================================================
+# RESILIENCE4J – Circuit Breaker, Retry, Bulkhead, Rate Limiter
+# ============================================================
+resilience4j:
+
+  # ── Circuit Breaker ─────────────────────────────────────────
+  circuitbreaker:
+    instances:
+      # Circuit Breaker para o serviço de estoque
+      estoque-service:
+        # Janela deslizante baseada em contagem (COUNT_BASED ou TIME_BASED)
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10           # analisa as últimas 10 chamadas
+        failure-rate-threshold: 50        # abre se ≥50% falhar
+        slow-call-rate-threshold: 80      # abre se ≥80% for lento
+        slow-call-duration-threshold: 2s  # lento = acima de 2 segundos
+        wait-duration-in-open-state: 10s  # fica OPEN por 10s antes de tentar HALF_OPEN
+        permitted-number-of-calls-in-half-open-state: 3  # testa 3 calls no HALF_OPEN
+        automatic-transition-from-open-to-half-open-enabled: true
+        # Exceções que NÃO contam como falha (ex: erro de negócio esperado)
+        ignore-exceptions:
+          - com.ecommerce.resilience.shared.exception.EstoqueInsuficienteException
+        register-health-indicator: true   # expõe no /actuator/health
+
+      # Circuit Breaker para serviço de pagamento (mais tolerante)
+      pagamento-service:
+        sliding-window-size: 20
+        failure-rate-threshold: 60
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 5
+        register-health-indicator: true
+
+  # ── Retry ────────────────────────────────────────────────────
+  retry:
+    instances:
+      estoque-service:
+        max-attempts: 3                   # tenta 3 vezes no total
+        wait-duration: 500ms              # espera 500ms entre tentativas
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2 # 500ms → 1s → 2s
+        # Só faz retry nestas exceções
+        retry-exceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+        # Nunca faz retry nestas exceções
+        ignore-exceptions:
+          - com.ecommerce.resilience.shared.exception.EstoqueInsuficienteException
+
+  # ── Bulkhead – isolamento de concorrência por recurso ────────
+  bulkhead:
+    instances:
+      estoque-service:
+        max-concurrent-calls: 10          # máximo 10 chamadas simultâneas
+        max-wait-duration: 0ms            # não espera – falha imediatamente se lotado
+
+  # ── Thread Pool Bulkhead – pool dedicado por serviço ─────────
+  thread-pool-bulkhead:
+    instances:
+      pagamento-service:
+        max-thread-pool-size: 4
+        core-thread-pool-size: 2
+        queue-capacity: 20
+
+  # ── Rate Limiter – controle de requisições por período ───────
+  ratelimiter:
+    instances:
+      api-publica:
+        limit-for-period: 100             # 100 requisições
+        limit-refresh-period: 1s          # por segundo
+        timeout-duration: 0ms             # falha imediatamente se exceder
+      api-admin:
+        limit-for-period: 1000
+        limit-refresh-period: 1s
+        timeout-duration: 100ms
+
+  # ── Time Limiter – timeout por chamada ───────────────────────
+  timelimiter:
+    instances:
+      estoque-service:
+        timeout-duration: 3s              # timeout de 3s por chamada
+        cancel-running-future: true
+
+# ============================================================
+# ACTUATOR – expõe métricas do Circuit Breaker
+# ============================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,retries
+  endpoint:
+    health:
+      show-details: always               # detalha estado dos CBs no /health
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+# ============================================================
+# SPRING CLOUD GATEWAY (porta separada – 8080)
+# ============================================================
+# Ver GatewayConfig.java para configuração programática
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+    io.github.resilience4j: DEBUG
+    org.springframework.cloud.gateway: DEBUG

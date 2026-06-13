@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: ecommerce-security
+
+  datasource:
+    url: jdbc:h2:mem:securitydb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+server:
+  port: 8080
+
+# ============================================================
+# Propriedades customizadas da aplicação
+# ============================================================
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:minha-chave-secreta-minimo-256-bits-para-hs256-seguranca}
+      expiration-minutes: 30          # tempo de vida do access token
+      refresh-expiration-days: 7      # tempo de vida do refresh token
+      issuer: ecommerce-api
+    cors:
+      allowed-origins:
+        - http://localhost:3000
+        - http://localhost:4200
+        - https://meu-frontend.com.br
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  # Habilita o botão Authorize no Swagger com Bearer Token
+  components:
+    security-schemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+    org.springframework.security: DEBUG   # útil para depurar filter chain

@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: ecommerce-webflux
+
+  # ============================================================
+  # R2DBC – driver não-bloqueante para banco relacional
+  # Substitui spring.datasource (JDBC bloqueante)
+  # ============================================================
+  r2dbc:
+    url: r2dbc:h2:mem:///webfluxdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+
+  # DDL via SQL (R2DBC não usa Hibernate DDL)
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+  # ============================================================
+  # MongoDB Reativo
+  # ============================================================
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ecommerce-reviews
+      # Em produção: use variável de ambiente SPRING_DATA_MONGODB_URI
+
+  # ============================================================
+  # Security – Resource Server reativo (valida JWT)
+  # ============================================================
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: minha-chave-secreta-minimo-256-bits-para-hs256-seguranca
+
+server:
+  port: 8080
+
+# ============================================================
+# Configurações do WebFlux
+# ============================================================
+spring.webflux:
+  base-path: /
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+    org.springframework.data.r2dbc: DEBUG   # loga queries R2DBC
+    reactor.netty: INFO

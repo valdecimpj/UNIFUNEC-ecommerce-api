@@ -1,0 +1,131 @@
+spring:
+  application:
+    name: ecommerce-observability
+
+  datasource:
+    url: jdbc:h2:mem:observabilitydb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false  # desative em produção – use logging de queries via p6spy
+
+  h2:
+    console:
+      enabled: true
+
+  # ============================================================
+  # CACHE – configuração do CacheManager
+  # ============================================================
+  cache:
+    type: redis    # tipo principal: Redis (L2)
+    # cache-names: produtos, categorias, usuarios  # declaração opcional
+
+  # ============================================================
+  # REDIS – cache distribuído L2
+  # ============================================================
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 1
+
+  # ============================================================
+  # DISTRIBUTED TRACING – Micrometer Tracing + Zipkin
+  # Spring Boot 3: configuração nativa, sem Sleuth
+  # ============================================================
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+  # Taxa de amostragem: 1.0 = 100% dos traces (dev)
+  # Em produção: 0.1 = 10% para reduzir overhead
+  tracing:
+    sampling:
+      probability: 1.0
+
+server:
+  port: 8080
+
+# ============================================================
+# ACTUATOR – endpoints de observabilidade
+# ============================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expõe endpoints específicos (nunca use * em produção sem auth)
+        include: health, info, metrics, prometheus, env, loggers,
+                 threaddump, heapdump, caches, flyway
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized  # detalhes só para usuários autenticados
+      show-components: always
+    prometheus:
+      enabled: true
+    caches:
+      enabled: true
+  metrics:
+    # Tags globais presentes em TODAS as métricas
+    tags:
+      application: ${spring.application.name}
+      environment: ${APP_ENV:dev}
+      region: ${APP_REGION:sa-east-1}
+    # Habilita métricas detalhadas da JVM
+    enable:
+      jvm: true
+      process: true
+      system: true
+      http.server.requests: true
+  # Exporta para Prometheus (scrape em /actuator/prometheus)
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60s  # agrega métricas a cada 60s antes de exportar
+  # Distributed tracing exposto no Actuator
+  tracing:
+    enabled: true
+
+# ============================================================
+# CONFIGURAÇÕES DE CACHE
+# ============================================================
+app:
+  cache:
+    produtos:
+      ttl-minutes: 10
+    categorias:
+      ttl-minutes: 60   # categorias mudam raramente
+    usuarios:
+      ttl-minutes: 5
+
+# ============================================================
+# INFO ENDPOINT – metadados da aplicação
+# ============================================================
+info:
+  app:
+    name: ${spring.application.name}
+    version: "1.0.0"
+    description: "Módulo 5 – Performance e Observabilidade"
+  java:
+    version: "24.0.2"
+  build:
+    time: "2026-06-13T02:35:55Z"
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+    org.springframework.cache: TRACE   # loga hits/misses de cache
+    io.micrometer: INFO
+  pattern:
+    # Inclui traceId e spanId no log – correlaciona com Zipkin
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId} spanId=%X{spanId} - %msg%n"
