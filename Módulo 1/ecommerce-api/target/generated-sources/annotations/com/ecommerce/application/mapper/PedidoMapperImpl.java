@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-12T16:51:42-0300",
+    date = "2026-06-13T13:42:41-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -27,9 +27,9 @@ public class PedidoMapperImpl implements PedidoMapper {
         PedidoResponseDTO.PedidoResponseDTOBuilder pedidoResponseDTO = PedidoResponseDTO.builder();
 
         pedidoResponseDTO.clienteId( pedido.getClienteId() );
+        pedidoResponseDTO.frete( pedido.getFrete() );
         pedidoResponseDTO.id( pedido.getId() );
         pedidoResponseDTO.itens( itemPedidoListToItemPedidoResponseDTOList( pedido.getItens() ) );
-        pedidoResponseDTO.frete( pedido.getFrete() );
         pedidoResponseDTO.status( pedido.getStatus() );
 
         pedidoResponseDTO.totalComFrete( pedido.calcularTotal() );

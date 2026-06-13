@@ -31,7 +31,7 @@ server:
 app:
   security:
     jwt:
-      secret: ${JWT_SECRET:minha-chave-secreta-minimo-256-bits-para-hs256-seguranca}
+      secret: 74b3c8e8-4635-4f3b-a525-14a2f0eda0cb
       expiration-minutes: 30          # tempo de vida do access token
       refresh-expiration-days: 7      # tempo de vida do refresh token
       issuer: ecommerce-api
@@ -40,6 +40,7 @@ app:
         - http://localhost:3000
         - http://localhost:4200
         - https://meu-frontend.com.br
+        - http://localhost:80
 
 springdoc:
   api-docs:

@@ -4,6 +4,7 @@ import com.ecommerce.security.domain.model.Usuario;
 import com.ecommerce.security.infrastructure.config.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +65,8 @@ public class TokenService {
                 .claim("token_type", "access")
                 .build();
 
-        String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+        String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
         log.debug("Access token gerado para usuário: {} | exp: {}", usuario.getEmail(), expiracao);
         return token;
     }
@@ -92,7 +94,8 @@ public class TokenService {
                 .claim("token_type", "refresh")
                 .build();
 
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
     // =========================================================================
