@@ -23,6 +23,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(CategoriaNaoEncontradaException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ProblemDetail handleCategoriaNaoEncontrada(CategoriaNaoEncontradaException ex) {
+        ProblemDetail problem = ProblemDetail
+                .forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Categoria não encontrada");
+        problem.setProperty("timestamp", Instant.now());
+        return problem;
+    }
+
     @SuppressWarnings("null")
 @ExceptionHandler(PedidoNaoEncontradoException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

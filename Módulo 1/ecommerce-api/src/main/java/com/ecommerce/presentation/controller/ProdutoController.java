@@ -9,8 +9,8 @@ import com.ecommerce.application.mapper.ProdutoMapper;
 import com.ecommerce.domain.exception.ProdutoNaoEncontradoException;
 import com.ecommerce.domain.model.Categoria;
 import com.ecommerce.domain.model.Produto;
+import com.ecommerce.domain.repository.CategoriaRepository;
 import com.ecommerce.domain.repository.ProdutoRepository;
-import com.ecommerce.infrastructure.persistence.CategoriaJpaRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ import java.util.List;
 public class ProdutoController {
 
     private final ProdutoRepository produtoRepository;
-    private final CategoriaJpaRepository categoriaRepository;
+    private final CategoriaRepository categoriaRepository;
     private final ProdutoMapper produtoMapper;
 
     @PostMapping
