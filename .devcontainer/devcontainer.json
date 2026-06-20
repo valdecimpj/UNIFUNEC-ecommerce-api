@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/java-postgres
 {
-	"name": "Java & PostgreSQL",
+	"name": "Java & Various Services",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -17,7 +17,11 @@
 		6379,   // Redis
 		9411,   // Zipkin
 		9090,   // Prometheus
-		3000    // Grafana
+		3000,   // Grafana
+		9080,   // Kafka UI
+		5540,   // RedisInsight
+		8082,   // mongo-express
+		8978    // CloudBeaver
 	],
 
 	"portsAttributes": {
@@ -30,7 +34,11 @@
 		"6379":  { "label": "Redis" },
 		"9411":  { "label": "Zipkin" },
 		"9090":  { "label": "Prometheus" },
-		"3000":  { "label": "Grafana" }
+		"3000":  { "label": "Grafana" },
+		"9080":  { "label": "Kafka UI" },
+		"5540":  { "label": "RedisInsight" },
+		"8082":  { "label": "mongo-express" },
+		"8978":  { "label": "CloudBeaver" }
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
