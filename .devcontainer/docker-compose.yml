@@ -30,7 +30,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       # Zipkin – Módulo 5
-      SPRING_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
 
     volumes:
       - ../..:/workspaces:cached
