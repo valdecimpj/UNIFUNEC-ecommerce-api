@@ -117,9 +117,9 @@ info:
     version: "1.0.0"
     description: "Módulo 5 – Performance e Observabilidade"
   java:
-    version: "24.0.2"
+    version: "21.0.10"
   build:
-    time: "2026-06-13T02:35:55Z"
+    time: "2026-06-17T23:09:55Z"
 
 logging:
   level:

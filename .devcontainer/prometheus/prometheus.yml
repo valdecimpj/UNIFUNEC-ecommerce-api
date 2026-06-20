@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Módulo 5 – ecommerce-observability (port 8080)
+  - job_name: 'ecommerce-observability'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['app:8080']
+        labels:
+          module: 'ecommerce-observability'
+
+  # Módulo 4 – ecommerce-resilience / actuator (port 8081)
+  - job_name: 'ecommerce-resilience'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['app:8081']
+        labels:
+          module: 'ecommerce-resilience'

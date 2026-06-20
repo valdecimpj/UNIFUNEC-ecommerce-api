@@ -4,14 +4,37 @@
 	"name": "Java & PostgreSQL",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	// Forward all infrastructure service ports to the host machine
+	"forwardPorts": [
+		5432,   // PostgreSQL
+		27017,  // MongoDB
+		9092,   // Kafka
+		5672,   // RabbitMQ AMQP
+		15672,  // RabbitMQ Management UI
+		8761,   // Eureka Server
+		6379,   // Redis
+		9411,   // Zipkin
+		9090,   // Prometheus
+		3000    // Grafana
+	],
+
+	"portsAttributes": {
+		"5432":  { "label": "PostgreSQL" },
+		"27017": { "label": "MongoDB" },
+		"9092":  { "label": "Kafka" },
+		"5672":  { "label": "RabbitMQ" },
+		"15672": { "label": "RabbitMQ Management" },
+		"8761":  { "label": "Eureka Server" },
+		"6379":  { "label": "Redis" },
+		"9411":  { "label": "Zipkin" },
+		"9090":  { "label": "Prometheus" },
+		"3000":  { "label": "Grafana" }
+	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {}
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// This can be used to network with other containers or with the host.
-	// "forwardPorts": [5432],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "java -version",

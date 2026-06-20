@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "EcommerceApplication",
+            "request": "launch",
+            "mainClass": "com.ecommerce.EcommerceApplication",
+            "projectName": "ecommerce-api"
+        },
+        {
+            "type": "java",
+            "name": "EcommerceObservabilityApplication",
+            "request": "launch",
+            "mainClass": "com.ecommerce.observability.EcommerceObservabilityApplication",
+            "projectName": "ecommerce-observability"
+        },
+        {
+            "type": "java",
+            "name": "EcommerceResilienceApplication",
+            "request": "launch",
+            "mainClass": "com.ecommerce.resilience.EcommerceResilienceApplication",
+            "projectName": "ecommerce-resilience"
+        },
+        {
+            "type": "java",
+            "name": "EcommerceSecurityApplication",
+            "request": "launch",
+            "mainClass": "com.ecommerce.security.EcommerceSecurityApplication",
+            "projectName": "ecommerce-security"
+        },
+        {
+            "type": "java",
+            "name": "EcommerceWebFluxApplication",
+            "request": "launch",
+            "mainClass": "com.ecommerce.webflux.EcommerceWebFluxApplication",
+            "projectName": "ecommerce-webflux"
+        }
+    ]
+}
